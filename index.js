@@ -82,14 +82,11 @@ async function main() {
   //   await sleep(800);
   //   await page.click(getSlotValueSelector(timeslot, "L3A.5"));
   await page.evaluate(getSlotValueSelector(timeslot, pod));
+  await sleep(1000);
   await page.waitForSelector("#submitPicks");
   await page.click("#submitPicks");
   await sleep(1000);
-  //   await page.$eval('button[data-bb-handler="confirm"]', (button) =>
-  //     button.click()
-  //   );
-  //   let slotSelector = getSlotValueSelector(14);
-  //   await page.waitForSelector(`div[slotvalue="${slotSelector}"]`);
-  //   console.log("hi");
-  //   await page.click(`div[slotvalue="${slotSelector}"]`);
+  await page.$eval('button[data-bb-handler="confirm"]', (button) =>
+    button.click()
+  );
 }
