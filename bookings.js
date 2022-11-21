@@ -1,13 +1,23 @@
 let bookings = [
+  // {
+  //   date: "29 nov 2022",
+  //   pod: "L3.1",
+  //   slot: 11,
+  // },
+  // {
+  //   date: "29 nov 2022",
+  //   pod: "L3.1",
+  //   slot: 12,
+  // },
+  // {
+  //   date: "1 dec 2022",
+  //   pod: "L4.2",
+  //   slot: 13,
+  // },
   {
-    date: "24 nov 2022",
-    pod: "L3.1",
-    slot: 13,
-  },
-  {
-    date: "25 nov 2022",
-    pod: "L4.1",
-    slot: 15,
+    date: "1 dec 2022",
+    pod: "L4.2",
+    slot: 14,
   },
 ];
 

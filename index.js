@@ -4,18 +4,18 @@ const bookings = require("./bookings.js");
 require("dotenv").config();
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const date = "30 nov 2022";
+// const date = "30 nov 2022";
 const timeslot = 12;
 const pod = "L3.2";
 
 const getDayTabSelector = (date) => {
-  d = new Date(date);
+  let d = new Date(date);
   let month = d.getMonth() + 1;
   date = d.getDate();
   return "#" + "id" + date + month + "2022";
 };
 
-const getSlotValueSelector = (time, pod) => {
+const getSlotValueSelector = (date, time, pod) => {
   // time is somethign like 15
   if (time < 9 || time > 19) return;
   time = parseInt(time);
@@ -31,12 +31,12 @@ const getSlotValueSelector = (time, pod) => {
 
   // pod is L1.3
   //   div[onkeypress*=\"'Pod @ L3A.5', '30/11/2022 12:00:00 AM','10:00 - 11:00'\"]
-  //   document.querySelector("div[onkeypress*=\"'Pod @ L3A.5', '30/11/2022 12:00:00 AM','10:00 - 11:00'\"]")
-  return `document.querySelector(\"div[onkeypress*=\\"\'Pod @ ${pod}\', \'30/11/2022 12:00:00 AM\',\'${timeString}\'\\"]\").click()`;
+  // document.querySelector("div[onkeypress*=\"'Pod @ L3A.5', '30/11/2022 12:00:00 AM','10:00 - 11:00'\"]")
+  return `document.querySelector(\"div[onkeypress*=\\"\'Pod @ ${pod}\', \'${dd}/${month}/2022 12:00:00 AM\',\'${timeString}\'\\"]\").click()`;
 };
 
 async function test() {
-  console.log(getSlotValueSelector(12, "L3A.5"));
+  console.log(getSlotValueSelector(11, "L3.1"));
 }
 
 const config = process.argv.slice(2)[0];
@@ -62,12 +62,13 @@ async function main() {
   await page.screenshot({ path: "homepage.png" });
   for (let booking of bookings) {
     const { date, pod, slot } = booking;
+    console.log(getSlotValueSelector(date, slot, pod));
     try {
       await page.waitForSelector(getDayTabSelector(date));
       await sleep(800);
       await page.click(getDayTabSelector(date));
       await page.waitForNavigation();
-      await page.evaluate(getSlotValueSelector(slot, pod));
+      await page.evaluate(getSlotValueSelector(date, slot, pod));
       await sleep(1000);
       await page.waitForSelector("#submitPicks");
       await page.click("#submitPicks");
@@ -77,6 +78,7 @@ async function main() {
       );
     } catch (e) {
       console.log(e);
+      continue;
     }
   }
 }
