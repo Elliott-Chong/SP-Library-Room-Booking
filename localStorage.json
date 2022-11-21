@@ -1,0 +1,7 @@
+{
+  "SPSuiteLinksJson": "{\"Scripts\":[\"\"],\"WorkloadLinks\":[{\"Id\":\"ShellNewsfeed\",\"Text\":\"Newsfeed\",\"Url\":\"https://my-site.sp.edu.sg:443/default.aspx\"},{\"Id\":\"ShellDocuments\",\"Text\":\"OneDrive\",\"Url\":\"https://my-site.sp.edu.sg:443/_layouts/15/MySite.aspx?MySiteRedirect=AllDocuments\"},{\"Id\":\"ShellSites\",\"Text\":\"Sites\",\"Url\":\"https://my-site.sp.edu.sg:443/_layouts/15/MySite.aspx?MySiteRedirect=AllSites\"}],\"AppsImage\":{\"AltText\":\"More\"},\"AllDocumentsLink\":null,\"AllSitesLink\":null}",
+  "SPSuiteLinksDate": "Mon Nov 21 2022 19:27:54 GMT+0800 (Singapore Standard Time)",
+  "SPSuiteLinksUserKey": "i:0e.t|adfs|p2211545@sp.edu.sg",
+  "SPSuiteLinksLanguage": "en-US",
+  "SPAnimationEnabled": "1"
+}
