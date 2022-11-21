@@ -33,7 +33,6 @@ const getSlotValueSelector = (time, pod) => {
   //   div[onkeypress*=\"'Pod @ L3A.5', '30/11/2022 12:00:00 AM','10:00 - 11:00'\"]
   //   document.querySelector("div[onkeypress*=\"'Pod @ L3A.5', '30/11/2022 12:00:00 AM','10:00 - 11:00'\"]")
   return `document.querySelector(\"div[onkeypress*=\\"\'Pod @ ${pod}\', \'30/11/2022 12:00:00 AM\',\'${timeString}\'\\"]\").click()`;
-  return `div[onkeypress*=\"\'Pod @ ${pod}\', \'${dd}/${month}/2022 12:00:00 AM\',${timeString}\"]`;
 };
 
 async function test() {
@@ -61,32 +60,23 @@ async function main() {
   await page.click("#submitButton");
 
   await page.screenshot({ path: "homepage.png" });
-  //   await page.goto(
-  //     "https://apps2.sp.edu.sg/apps/lrbs/pages/home.aspx?selectedDate=28/11/2022"
-  //   );
-
-  //   let ls = JSON.parse(await fs.readFile("./localStorage.json"));
-  //   let cookies = JSON.parse(await fs.readFile("./cookies.json"));
-  //   await page.setCookie(...cookies);
-  //   await page.evaluate((ls) => {
-  //     for (var key in ls) {
-  //       localStorage.setItem(key, ls[key]);
-  //     }
-  //   }, ls);
-
-  await page.waitForSelector(getDayTabSelector(date));
-  await sleep(800);
-  await page.click(getDayTabSelector(date));
-  await page.waitForNavigation();
-  //   await page.waitForSelector(getSlotValueSelector(timeslot, "L3A.5"));
-  //   await sleep(800);
-  //   await page.click(getSlotValueSelector(timeslot, "L3A.5"));
-  await page.evaluate(getSlotValueSelector(timeslot, pod));
-  await sleep(1000);
-  await page.waitForSelector("#submitPicks");
-  await page.click("#submitPicks");
-  await sleep(1000);
-  await page.$eval('button[data-bb-handler="confirm"]', (button) =>
-    button.click()
-  );
+  for (let booking of bookings) {
+    const { date, pod, slot } = booking;
+    try {
+      await page.waitForSelector(getDayTabSelector(date));
+      await sleep(800);
+      await page.click(getDayTabSelector(date));
+      await page.waitForNavigation();
+      await page.evaluate(getSlotValueSelector(slot, pod));
+      await sleep(1000);
+      await page.waitForSelector("#submitPicks");
+      await page.click("#submitPicks");
+      await sleep(1000);
+      await page.$eval('button[data-bb-handler="confirm"]', (button) =>
+        button.click()
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  }
 }

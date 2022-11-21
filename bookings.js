@@ -1,6 +1,6 @@
 let bookings = [
   {
-    date: "20 nov 2022",
+    date: "24 nov 2022",
     pod: "L3.1",
     slot: 13,
   },
