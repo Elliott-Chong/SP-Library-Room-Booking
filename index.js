@@ -3,6 +3,7 @@ const bookings = require("./bookings.js");
 const fs = require("fs").promises;
 require("dotenv").config();
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const cron = require("node-cron");
 
 const LOG_FILE = "./bookings.log";
 
@@ -45,9 +46,10 @@ async function test() {}
 
 const config = process.argv.slice(2)[0];
 if (config === "test") {
-  test();
+  //test();
 } else {
-  main();
+  //main();
+  cron.schedule("*/2 * * * *",()=>main())
 }
 
 async function main() {
@@ -55,7 +57,7 @@ async function main() {
   await log("\n\nScript is starting to execute at " + now + "\n");
   await log("Username: " + process.env.sp_username + "\n");
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
   });
   for (let i = 0; i < bookings.length; i++) {
     let booking = bookings[i];
