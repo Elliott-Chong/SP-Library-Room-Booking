@@ -15,9 +15,14 @@ let bookings = [
   //   slot: 13,
   // },
   {
-    date: "1 dec 2022",
-    pod: "L4.2",
-    slot: 14,
+    date: "5 dec 2022",
+    pod: "L4.1",
+    slot: 9,
+  },
+  {
+    date: "5 dec 2022",
+    pod: "L4.1",
+    slot: 10,
   },
 ];
 

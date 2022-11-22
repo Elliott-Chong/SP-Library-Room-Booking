@@ -18,9 +18,13 @@ const getDayTabSelector = (date) => {
 const getSlotValueSelector = (date, time, pod) => {
   // time is somethign like 15
   if (time < 9 || time > 19) return;
-  time = parseInt(time);
   // slotvalue="14:00 - 15:00"
-  let timeString = time + ":00" + " - " + (time + 1) + ":00";
+  if (time <= 9) {
+    time = "0" + parseInt(time);
+  } else {
+    time = parseInt(time);
+  }
+  let timeString = time + ":00" + " - " + (parseInt(time) + 1) + ":00";
   let d = new Date(date);
   let dd = d.getDate();
   let month = d.getMonth() + 1;
@@ -32,7 +36,7 @@ const getSlotValueSelector = (date, time, pod) => {
   // pod is L1.3
   //   div[onkeypress*=\"'Pod @ L3A.5', '30/11/2022 12:00:00 AM','10:00 - 11:00'\"]
   // document.querySelector("div[onkeypress*=\"'Pod @ L3A.5', '30/11/2022 12:00:00 AM','10:00 - 11:00'\"]")
-  return `document.querySelector(\"div[onkeypress*=\\"\'Pod @ ${pod}\', \'${dd}/${month}/2022 12:00:00 AM\',\'${timeString}\'\\"]\").click()`;
+  return `document.querySelector(\"div[onclick*=\\"\'Pod @ ${pod}\', \'${dd}/${month}/2022 12:00:00 AM\',\'${timeString}\'\\"]\")?.click()`;
 };
 
 async function test() {
@@ -59,23 +63,38 @@ async function main() {
   await page.waitForSelector("#submitButton");
   await page.click("#submitButton");
 
-  await page.screenshot({ path: "homepage.png" });
-  for (let booking of bookings) {
+  page.on("error", function (err) {
+    theTempValue = err.toString();
+    console.log("Elliott Error: ");
+  });
+  page.on("pageerror", function (err) {
+    console.log("Elliott Error: ");
+  });
+  for (let i = 0; i < bookings.length; i++) {
+    let booking = bookings[i];
     const { date, pod, slot } = booking;
     console.log(getSlotValueSelector(date, slot, pod));
     try {
-      await page.waitForSelector(getDayTabSelector(date));
-      await sleep(800);
-      await page.click(getDayTabSelector(date));
-      await page.waitForNavigation();
-      await page.evaluate(getSlotValueSelector(date, slot, pod));
-      await sleep(1000);
-      await page.waitForSelector("#submitPicks");
-      await page.click("#submitPicks");
-      await sleep(1000);
-      await page.$eval('button[data-bb-handler="confirm"]', (button) =>
-        button.click()
-      );
+      if (i == 0 || bookings[i - 1]?.date !== bookings[i].date) {
+        await page.waitForSelector(getDayTabSelector(date));
+        await sleep(800);
+        await page.click(getDayTabSelector(date));
+        await page.waitForNavigation();
+      }
+      await page.screenshot({ path: "booking.png" });
+      try {
+        await page.evaluate(getSlotValueSelector(date, slot, pod));
+        await sleep(1000);
+        await page.waitForSelector("#submitPicks", { timeout: 2000 });
+        await page.click("#submitPicks");
+        await sleep(1000);
+        await page.$eval('button[data-bb-handler="confirm"]', (button) =>
+          button.click()
+        );
+      } catch (error) {
+        console.log("elliott error");
+        continue;
+      }
     } catch (e) {
       console.log(e);
       continue;
