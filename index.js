@@ -1,12 +1,10 @@
 const puppeteer = require("puppeteer");
 const bookings = require("./bookings.js");
-// const fs = require("fs").promises;
+const fs = require("fs").promises;
 require("dotenv").config();
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// const date = "30 nov 2022";
-const timeslot = 12;
-const pod = "L3.2";
+const LOG_FILE = "./bookings.log";
 
 const getDayTabSelector = (date) => {
   let d = new Date(date);
@@ -39,9 +37,11 @@ const getSlotValueSelector = (date, time, pod) => {
   return `document.querySelector(\"div[onclick*=\\"\'Pod @ ${pod}\', \'${dd}/${month}/2022 12:00:00 AM\',\'${timeString}\'\\"]\")?.click()`;
 };
 
-async function test() {
-  console.log(getSlotValueSelector(11, "L3.1"));
+async function log(data) {
+  await fs.appendFile(LOG_FILE, data);
 }
+
+async function test() {}
 
 const config = process.argv.slice(2)[0];
 if (config === "test") {
@@ -51,6 +51,9 @@ if (config === "test") {
 }
 
 async function main() {
+  let now = new Date().toString().split(" GMT")[0];
+  await log("\n\nScript is starting to execute at " + now + "\n");
+  await log("Username: " + process.env.sp_username + "\n");
   const browser = await puppeteer.launch({
     headless: false,
   });
@@ -92,8 +95,15 @@ async function main() {
         await page.$eval('button[data-bb-handler="confirm"]', (button) =>
           button.click()
         );
+        console.log(`Pod ${pod} has been booked on ${date} on slot ${slot}\n`);
+        await log(`Pod ${pod} has been booked on ${date} on slot ${slot}\n`);
       } catch (error) {
-        console.log("elliott error", error);
+        console.log(
+          `Pod ${pod} on ${date} at slot ${slot} has already been booked :(\n`
+        );
+        await log(
+          `Pod ${pod} on ${date} at slot ${slot} has already been booked :(\n`
+        );
         continue;
       }
     } catch (e) {
@@ -101,4 +111,9 @@ async function main() {
       continue;
     }
   }
+  await browser.close();
+  let end = new Date().toString().split(" GMT")[0];
+  await log("Script finished successfully at " + end + "\n\n");
+  await log("-------------------------------------------------------------");
+  console.log("Success!");
 }
