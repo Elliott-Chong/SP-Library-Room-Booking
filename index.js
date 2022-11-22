@@ -4,6 +4,7 @@ const fs = require("fs").promises;
 require("dotenv").config();
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const cron = require("node-cron");
+const users = require("./users.js");
 
 const LOG_FILE = "./bookings.log";
 
@@ -46,32 +47,33 @@ async function test() {}
 
 const config = process.argv.slice(2)[0];
 if (config === "test") {
-  //test();
-} else {
-  //main();
-  cron.schedule("*/2 * * * *",()=>main())
+  test();
+} else if (config === "cron") {
+  cron.schedule("*/2 * * * *", () => main());
+} else if (config === "main") {
+  main();
 }
 
 async function main() {
   let now = new Date().toString().split(" GMT")[0];
   await log("\n\nScript is starting to execute at " + now + "\n");
-  await log("Username: " + process.env.sp_username + "\n");
-  const browser = await puppeteer.launch({
-    headless: true,
-  });
   for (let i = 0; i < bookings.length; i++) {
+    let user_index = 0;
+    await log("\nUsername: " + users[user_index].username + "\n");
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
     let booking = bookings[i];
     const { date, pod, slot } = booking;
     let page = await browser.newPage();
     await page.goto(
       "https://adfs.sp.edu.sg/adfs/ls?wa=wsignin1.0&wtrealm=urn%3aportal%3asp2016prod&wctx=https%3a%2f%2fapps2.sp.edu.sg%2fapps%2flrbs%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fapps%252Flrbs%252FPages%252FHome%252Easpx&client-request-id=08ab5ab4-d4b8-4f47-ef12-0080010000f0&RedirectToIdentityProvider=AD+AUTHORITY"
     );
-    if (i === 0) {
-      await page.type("#userNameInput", process.env.sp_username);
-      await page.type("#passwordInput", process.env.sp_password);
-      await page.waitForSelector("#submitButton");
-      await page.click("#submitButton");
-    }
+
+    await page.type("#userNameInput", users[user_index].userid);
+    await page.type("#passwordInput", users[user_index].password);
+    await page.waitForSelector("#submitButton");
+    await page.click("#submitButton");
 
     page.on("error", function (err) {
       theTempValue = err.toString();
@@ -96,14 +98,18 @@ async function main() {
         await page.$eval('button[data-bb-handler="confirm"]', (button) =>
           button.click()
         );
-        console.log(`Pod ${pod} has been booked on ${date} on slot ${slot}\n`);
-        await log(`Pod ${pod} has been booked on ${date} on slot ${slot}\n`);
-      } catch (error) {
         console.log(
-          `Pod ${pod} on ${date} at slot ${slot} has already been booked :(\n`
+          `Success! Pod ${pod} has been booked on ${date} on slot ${slot}\n`
         );
         await log(
-          `Pod ${pod} on ${date} at slot ${slot} has already been booked :(\n`
+          `Success! Pod ${pod} has been booked on ${date} on slot ${slot}\n`
+        );
+      } catch (error) {
+        console.log(
+          `Error! Pod ${pod} on ${date} at slot ${slot} has already been booked :(\n`
+        );
+        await log(
+          `Error! Pod ${pod} on ${date} at slot ${slot} has already been booked :(\n`
         );
         continue;
       }
@@ -111,8 +117,8 @@ async function main() {
       console.log(e);
       continue;
     }
+    await browser.close();
   }
-  await browser.close();
   let end = new Date().toString().split(" GMT")[0];
   await log("Script finished successfully at " + end + "\n\n");
   await log("-------------------------------------------------------------");
