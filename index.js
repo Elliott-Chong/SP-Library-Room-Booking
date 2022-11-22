@@ -54,34 +54,35 @@ async function main() {
   const browser = await puppeteer.launch({
     headless: false,
   });
-  let page = await browser.newPage();
-  await page.goto(
-    "https://adfs.sp.edu.sg/adfs/ls?wa=wsignin1.0&wtrealm=urn%3aportal%3asp2016prod&wctx=https%3a%2f%2fapps2.sp.edu.sg%2fapps%2flrbs%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fapps%252Flrbs%252FPages%252FHome%252Easpx&client-request-id=08ab5ab4-d4b8-4f47-ef12-0080010000f0&RedirectToIdentityProvider=AD+AUTHORITY"
-  );
-  await page.type("#userNameInput", process.env.sp_username);
-  await page.type("#passwordInput", process.env.sp_password);
-  await page.waitForSelector("#submitButton");
-  await page.click("#submitButton");
-
-  page.on("error", function (err) {
-    theTempValue = err.toString();
-    console.log("Elliott Error: ");
-  });
-  page.on("pageerror", function (err) {
-    console.log("Elliott Error: ");
-  });
   for (let i = 0; i < bookings.length; i++) {
     let booking = bookings[i];
     const { date, pod, slot } = booking;
+    let page = await browser.newPage();
+    await page.goto(
+      "https://adfs.sp.edu.sg/adfs/ls?wa=wsignin1.0&wtrealm=urn%3aportal%3asp2016prod&wctx=https%3a%2f%2fapps2.sp.edu.sg%2fapps%2flrbs%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fapps%252Flrbs%252FPages%252FHome%252Easpx&client-request-id=08ab5ab4-d4b8-4f47-ef12-0080010000f0&RedirectToIdentityProvider=AD+AUTHORITY"
+    );
+    if (i === 0) {
+      await page.type("#userNameInput", process.env.sp_username);
+      await page.type("#passwordInput", process.env.sp_password);
+      await page.waitForSelector("#submitButton");
+      await page.click("#submitButton");
+    }
+
+    page.on("error", function (err) {
+      theTempValue = err.toString();
+      console.log("Elliott Error: ");
+    });
+    page.on("pageerror", function (err) {
+      console.log("Elliott Error: ");
+    });
     console.log(getSlotValueSelector(date, slot, pod));
     try {
-      if (i == 0 || bookings[i - 1]?.date !== bookings[i].date) {
-        await page.waitForSelector(getDayTabSelector(date));
-        await sleep(800);
-        await page.click(getDayTabSelector(date));
-        await page.waitForNavigation();
-      }
+      await page.waitForSelector(getDayTabSelector(date));
+      await sleep(800);
+      await page.click(getDayTabSelector(date));
+      await page.waitForNavigation();
       await page.screenshot({ path: "booking.png" });
+      await sleep(1000);
       try {
         await page.evaluate(getSlotValueSelector(date, slot, pod));
         await sleep(1000);
@@ -92,7 +93,7 @@ async function main() {
           button.click()
         );
       } catch (error) {
-        console.log("elliott error");
+        console.log("elliott error", error);
         continue;
       }
     } catch (e) {
