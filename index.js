@@ -84,7 +84,6 @@ async function main() {
       await sleep(800);
       await page.click(getDayTabSelector(date));
       await page.waitForNavigation();
-      await page.screenshot({ path: "booking.png" });
       await sleep(1000);
       try {
         await page.evaluate(getSlotValueSelector(date, slot, pod));
