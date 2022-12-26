@@ -69,7 +69,7 @@ async function main() {
   });
 
   let two_weeks_from_now = new Date(
-    new Date().setDate(new Date().getDate() + 11)
+    new Date().setDate(new Date().getDate() + 13)
   ).toString();
 
   // console.log(two_weeks_from_now);
