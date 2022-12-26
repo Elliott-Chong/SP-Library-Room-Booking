@@ -52,9 +52,11 @@ const config = process.argv.slice(2)[0];
 if (config === "test") {
   test();
 } else if (config === "cron") {
-  cron.schedule("*/2 * * * *", () => main());
+  cron.schedule("3 0 * * *", () => main());
 } else if (config === "main") {
   main();
+} else {
+  cron.schedule("3 0 * * *", () => main());
 }
 
 async function main() {
@@ -63,7 +65,7 @@ async function main() {
   let user_index = 0;
   await log("\nUsername: " + users[user_index].username + "\n");
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
   });
 
   let two_weeks_from_now = new Date(
@@ -106,6 +108,7 @@ async function main() {
     await sleep(2000);
     await page.waitForSelector("#submitPicks", { timeout: 2000 });
     await page.click("#submitPicks");
+	log("submit button has been pressed\n")
     await sleep(1000);
     await page.$eval('button[data-bb-handler="confirm"]', (button) =>
       button.click()
