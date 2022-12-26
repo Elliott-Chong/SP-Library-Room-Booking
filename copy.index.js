@@ -12,7 +12,7 @@ const getDayTabSelector = (date) => {
   let d = new Date(date);
   let month = d.getMonth() + 1;
   date = d.getDate();
-  return "#" + "id" + date + month + "2022";
+  return "#" + "id" + date + month + "2023";
 };
 
 const getSlotValueSelector = (date, time, pod) => {
@@ -31,7 +31,7 @@ const getSlotValueSelector = (date, time, pod) => {
   let d = new Date(date);
   let dd = d.getDate();
   let month = d.getMonth() + 1;
-  let year = 2022;
+  let year = 2023;
   // 'Pod @ L1.3', '30/11/2022 12:00:00 AM','11:00 - 12:00');
   // 'Pod @ L1.2', '30/11/2022 12:00:00 AM','19:00 - 20:00');
   //   Pod @ L3A.5', '30/11/2022 12:00:00 AM','12:00 - 13:00'); "
@@ -39,7 +39,7 @@ const getSlotValueSelector = (date, time, pod) => {
   // pod is L1.3
   //   div[onkeypress*=\"'Pod @ L3A.5', '30/11/2022 12:00:00 AM','10:00 - 11:00'\"]
   // document.querySelector("div[onkeypress*=\"'Pod @ L3A.5', '30/11/2022 12:00:00 AM','10:00 - 11:00'\"]")
-  return `document.querySelector(\"div[onclick*=\\"\'Pod @ ${pod}\', \'${dd}/${month}/2022 12:00:00 AM\',\'${timeString}\'\\"]\")?.click()`;
+  return `document.querySelector(\"div[onclick*=\\"\'Pod @ ${pod}\', \'${dd}/${month}/2023 12:00:00 AM\',\'${timeString}\'\\"]\")?.click()`;
 };
 
 async function log(data) {
@@ -69,8 +69,10 @@ async function main() {
   });
 
   let two_weeks_from_now = new Date(
-    new Date().setDate(new Date().getDate() + 13)
+    new Date().setDate(new Date().getDate() + 11)
   ).toString();
+
+  // console.log(two_weeks_from_now);
 
   const booking = {
     date: two_weeks_from_now,
@@ -108,7 +110,7 @@ async function main() {
     await sleep(2000);
     await page.waitForSelector("#submitPicks", { timeout: 2000 });
     await page.click("#submitPicks");
-	log("submit button has been pressed\n")
+    log("submit button has been pressed\n");
     await sleep(1000);
     await page.$eval('button[data-bb-handler="confirm"]', (button) =>
       button.click()
